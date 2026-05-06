@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --starbucks-green: #006241;
+    --accent-green: #00754A;
+    --house-green: #1E3932;
+    --gold: #cba258;
+    --warm-neutral: #f2f0eb;
+    --ceramic: #edebe9;
+  }
+
+  body {
+    @apply bg-[#f9f9f9] text-text-black font-sans antialiased;
+    background-image: radial-gradient(at 0% 0%, rgba(212, 233, 226, 0.15) 0, transparent 50%), 
+                      radial-gradient(at 50% 0%, rgba(242, 240, 235, 0.3) 0, transparent 50%);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-bold text-house-green tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent-green text-white px-8 py-3 rounded-pill font-semibold shadow-lg shadow-accent-green/20 transition-all duration-300 hover:bg-starbucks-green hover:-translate-y-0.5 active:scale-95;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-accent-green text-accent-green bg-transparent px-10 py-3 rounded-pill font-semibold transition-all duration-300 hover:bg-accent-green hover:text-white active:scale-95;
+  }
+
+  .btn-gold {
+    @apply bg-gold text-white px-8 py-3 rounded-pill font-semibold shadow-lg shadow-gold/20 transition-all duration-300 hover:brightness-110 hover:-translate-y-0.5 active:scale-95;
+  }
+
+  .card {
+    @apply bg-white rounded-[16px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 border border-black/[0.03] transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)];
+  }
+
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md rounded-[16px] border border-white/20 shadow-xl;
+  }
+
+  .sidebar-link {
+    @apply flex items-center gap-3 px-5 py-3.5 rounded-xl text-text-black-soft hover:bg-starbucks-green/[0.05] hover:text-starbucks-green transition-all duration-200 font-medium;
+  }
+
+  .sidebar-link.active {
+    @apply bg-starbucks-green text-white shadow-lg shadow-starbucks-green/20 font-semibold;
+  }
+
+  .frap-button {
+    @apply fixed bottom-8 right-8 w-16 h-16 bg-starbucks-green text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-50 cursor-pointer;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-brew {
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .status-badge {
+    @apply px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border;
+  }
+}
+
+@layer utilities {
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  .bg-starbucks-mesh {
+    background-color: #006241;
+    background-image: 
+      radial-gradient(at 40% 20%, #00754A 0px, transparent 50%),
+      radial-gradient(at 80% 0%, #1E3932 0px, transparent 50%),
+      radial-gradient(at 0% 50%, #2b5148 0px, transparent 50%);
+  }
+}

@@ -1,0 +1,125 @@
+@model TaskManagement.Web.Models.ViewModels.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In | Task Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'starbucks-green': '#006241',
+                        'house-green': '#1e3932',
+                        'gold': '#cba258',
+                        'warm-neutral': '#f2f0eb',
+                        'ceramic': '#d4e1d1',
+                        'text-black': '#000000',
+                        'text-black-soft': '#000000de',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        .login-bg {
+            background-image: url('/starbucks_login_bg_1777800415730.png');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="bg-ceramic min-h-screen flex overflow-hidden">
+    <!-- Left Side: Visual -->
+    <div class="hidden lg:block lg:w-1/2 login-bg relative">
+        <div class="absolute inset-0 bg-house-green/40 backdrop-blur-[2px]"></div>
+        <div class="absolute inset-0 flex flex-col justify-end p-20 text-white">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-8 shadow-2xl">
+                <i class="fa-solid fa-check text-starbucks-green text-4xl"></i>
+            </div>
+            <h1 class="text-6xl font-black mb-6 leading-tight">Làm chủ quy trình của bạn.</h1>
+            <p class="text-xl text-white/80 max-w-md font-medium leading-relaxed">Gia nhập cùng hàng ngàn cộng sự để tối ưu hóa công việc của bạn với trình quản lý nhiệm vụ chuyên nghiệp nhất.</p>
+        </div>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#f9f9f9] relative">
+        <!-- Decorative element -->
+        <div class="absolute top-0 right-0 w-64 h-64 bg-accent-green/5 rounded-full -mr-32 -mt-32"></div>
+        
+        <div class="max-w-md w-full relative z-10">
+            <div class="mb-12">
+                <h2 class="text-4xl font-extrabold text-house-green mb-2">Chào mừng trở lại</h2>
+                <p class="text-text-black-soft font-medium">Vui lòng nhập thông tin để đăng nhập.</p>
+            </div>
+            
+            <form asp-action="Login" method="post" class="space-y-6">
+                <div asp-validation-summary="ModelOnly" class="bg-red-50 border-l-4 border-red-500 p-4 text-red-700 text-sm mb-6 rounded-r-lg"></div>
+
+                <div class="space-y-2">
+                    <label asp-for="Email" class="text-sm font-bold text-house-green uppercase tracking-wider">Địa chỉ Email</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-text-black-soft"></i>
+                        <input asp-for="Email" class="w-full pl-12 pr-4 py-4 rounded-xl border border-black/[0.08] focus:border-starbucks-green focus:ring-4 focus:ring-starbucks-green/10 outline-none transition-all bg-white" placeholder="partner@starbucks.com" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-red-500 text-xs font-medium"></span>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label asp-for="Password" class="text-sm font-bold text-house-green uppercase tracking-wider">Mật khẩu</label>
+                        <a href="#" class="text-xs text-accent-green font-bold hover:underline">Quên mật khẩu?</a>
+                    </div>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-text-black-soft"></i>
+                        <input asp-for="Password" id="password-input" type="password" class="w-full pl-12 pr-12 py-4 rounded-xl border border-black/[0.08] focus:border-starbucks-green focus:ring-4 focus:ring-starbucks-green/10 outline-none transition-all bg-white" placeholder="••••••••" />
+                        <button type="button" id="toggle-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-text-black-soft hover:text-starbucks-green">
+                            <i class="fa-solid fa-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-red-500 text-xs font-medium"></span>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input asp-for="RememberMe" type="checkbox" class="w-5 h-5 rounded-md border-black/[0.1] text-starbucks-green focus:ring-starbucks-green transition-all" />
+                    <label asp-for="RememberMe" class="text-sm text-text-black-soft font-medium">Ghi nhớ đăng nhập trong 30 ngày</label>
+                </div>
+
+                <button type="submit" class="w-full btn-primary py-5 text-lg shadow-2xl">Đăng nhập ngay</button>
+            </form>
+
+            <div class="mt-12 text-center">
+                <p class="text-text-black-soft font-medium">
+                    Mới tham gia nền tảng? 
+                    <a asp-action="Register" class="text-accent-green font-extrabold hover:underline ml-1">Tạo tài khoản mới</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const togglePassword = document.querySelector('#toggle-password');
+        const passwordInput = document.querySelector('#password-input');
+        const eyeIcon = document.querySelector('#eye-icon');
+
+        togglePassword.addEventListener('click', function (e) {
+            // toggle the type attribute
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // toggle the eye icon
+            eyeIcon.classList.toggle('fa-eye');
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+    </script>
+</body>
+</html>

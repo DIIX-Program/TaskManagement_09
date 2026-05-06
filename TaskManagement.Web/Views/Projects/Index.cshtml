@@ -1,0 +1,145 @@
+@model IEnumerable<TaskManagement.Web.Services.ProjectViewModel>
+
+<div class="flex flex-col gap-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-starbucks-green">Dự án</h1>
+            <p class="text-text-black-soft">Quản lý và theo dõi các quy trình làm việc của bạn.</p>
+        </div>
+        @if (Context.Session.GetString("Role") != "Employee")
+        {
+            <a asp-action="Create" class="btn-primary flex items-center gap-2">
+                <i class="fa-solid fa-plus"></i>
+                <span>Dự án mới</span>
+            </a>
+        }
+    </div>
+
+    <!-- Search and Filter Bar -->
+    <div class="flex gap-4 items-center bg-white p-4 rounded-xl border border-black/[0.06] shadow-sm">
+        <div class="flex-1 relative">
+            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-text-black-soft"></i>
+            <input type="text" id="projectSearch" placeholder="Tìm kiếm dự án theo tên hoặc mô tả..." class="w-full pl-12 pr-4 py-2 bg-ceramic/50 rounded-lg outline-none focus:ring-2 focus:ring-starbucks-green/20" />
+        </div>
+        <select id="statusFilter" class="bg-ceramic/50 px-4 py-2 rounded-lg outline-none border-none text-sm font-semibold">
+            <option value="All">Tất cả trạng thái</option>
+            <option value="Active">Đang thực hiện</option>
+            <option value="Completed">Đã hoàn thành</option>
+        </select>
+    </div>
+
+    <!-- Project Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @foreach (var project in Model)
+        {
+            <div class="card group hover:border-starbucks-green transition-all cursor-pointer project-card" 
+                 data-name="@project.Name.ToLower()" 
+                 data-desc="@project.Description?.ToLower()"
+                 data-status="@(project.Progress == 100 ? "Completed" : "Active")"
+                 onclick="location.href='@Url.Action("Details", new { id = project.ProjectId })'">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="w-12 h-12 bg-light-green rounded-xl flex items-center justify-center text-starbucks-green group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-mug-hot text-xl"></i>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        @if (project.Progress == 100)
+                        {
+                            <span class="px-3 py-1 bg-starbucks-green/10 text-starbucks-green text-[10px] font-bold uppercase tracking-widest rounded-full">Hoàn thành</span>
+                        }
+                        else
+                        {
+                            <span class="px-3 py-1 bg-accent-green/10 text-accent-green text-[10px] font-bold uppercase tracking-widest rounded-full">Đang chạy</span>
+                        }
+                        
+                        @if (Context.Session.GetString("Role") == "Admin")
+                        {
+                            <button onclick="event.stopPropagation(); deleteProject(@project.ProjectId)" class="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        }
+                    </div>
+                </div>
+                <h3 class="text-xl font-bold text-text-black mb-2">@project.Name</h3>
+                <p class="text-sm text-text-black-soft mb-6 line-clamp-2">@project.Description</p>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between text-xs text-text-black-soft font-semibold uppercase">
+                        <span>Tiến độ</span>
+                        <span>@project.Progress%</span>
+                    </div>
+                    <div class="w-full bg-ceramic h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-starbucks-green h-full rounded-full" style="width: @project.Progress%"></div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-black/[0.06] flex justify-between items-center">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-ceramic border-2 border-white flex items-center justify-center text-[10px] font-bold">JD</div>
+                        <div class="w-8 h-8 rounded-full bg-starbucks-green border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">AS</div>
+                        @if (project.MemberCount > 2)
+                        {
+                            <div class="w-8 h-8 rounded-full bg-gold border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">+@(project.MemberCount - 2)</div>
+                        }
+                    </div>
+                    <span class="text-xs text-text-black-soft">Tạo ngày @project.CreatedAt.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="col-span-full py-20 text-center bg-white rounded-2xl border-2 border-dashed border-black/[0.06]">
+                <div class="w-20 h-20 bg-ceramic rounded-full flex items-center justify-center mx-auto mb-4 text-text-black-soft">
+                    <i class="fa-solid fa-folder-open text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-text-black">Chưa có dự án nào</h3>
+                <p class="text-text-black-soft mt-2">Hãy bắt đầu pha chế dự án đầu tiên của bạn.</p>
+                @if (Context.Session.GetString("Role") != "Employee")
+                {
+                    <a asp-action="Create" class="btn-primary mt-6 inline-block">Tạo dự án</a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function applyFilters() {
+            const searchTerm = document.getElementById('projectSearch').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            document.querySelectorAll('.project-card').forEach(card => {
+                const name = card.getAttribute('data-name');
+                const desc = card.getAttribute('data-desc');
+                const status = card.getAttribute('data-status');
+
+                const matchesSearch = name.includes(searchTerm) || desc.includes(searchTerm);
+                const matchesStatus = statusFilter === 'All' || status === statusFilter;
+
+                if (matchesSearch && matchesStatus) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        document.getElementById('projectSearch').addEventListener('input', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+        async function deleteProject(id) {
+            if(!confirm('Bạn có chắc chắn muốn xóa dự án này?')) return;
+
+            const response = await fetch(`/Projects/Delete?id=${id}`, {
+                method: 'POST'
+            });
+
+            if(response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi xóa dự án');
+            }
+        }
+    </script>
+}

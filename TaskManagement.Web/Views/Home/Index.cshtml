@@ -1,0 +1,129 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TaskBrew | Brew Your Success</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'starbucks-green': '#006241',
+                        'house-green': '#1e3932',
+                        'gold': '#cba258',
+                        'warm-neutral': '#f2f0eb',
+                        'ceramic': '#d4e1d1',
+                        'text-black': '#000000',
+                        'text-black-soft': '#000000de',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-warm-neutral font-sans antialiased overflow-x-hidden">
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between px-12 py-6 absolute top-0 w-full z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 bg-starbucks-green rounded-full flex items-center justify-center text-white shadow-lg">
+                <i class="fa-solid fa-mug-hot"></i>
+            </div>
+            <span class="text-2xl font-black text-house-green tracking-tighter">TaskBrew</span>
+        </div>
+        <div class="flex items-center gap-8">
+            <a href="#" class="text-sm font-bold text-house-green hover:text-starbucks-green transition-colors">Our Blend</a>
+            <a href="#" class="text-sm font-bold text-house-green hover:text-starbucks-green transition-colors">Partner Perks</a>
+            <a asp-controller="Auth" asp-action="Login" class="btn-primary py-2 px-6">Partner Login</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center px-12 pt-20 relative overflow-hidden">
+        <div class="max-w-3xl relative z-10 animate-brew">
+            <span class="inline-block px-4 py-1 bg-gold/20 text-gold text-xs font-black uppercase tracking-[0.2em] rounded-full mb-6 border border-gold/30">Now Brewing Excellence</span>
+            <h1 class="text-8xl font-black text-house-green leading-[0.9] mb-8">Brewing<br/><span class="text-starbucks-green">Success</span>,<br/>Task by Task.</h1>
+            <p class="text-xl text-text-black-soft max-w-lg mb-10 font-medium leading-relaxed">The only project management platform that works as hard as your morning espresso. Organize, collaborate, and conquer your goals with aroma.</p>
+            <div class="flex gap-4">
+                <a asp-controller="Auth" asp-action="Register" class="btn-gold px-10 py-4 text-lg">Get Started Free</a>
+                <button class="px-10 py-4 rounded-pill border-2 border-house-green text-house-green font-bold hover:bg-house-green hover:text-white transition-all text-lg">See the Roast</button>
+            </div>
+        </div>
+        
+        <!-- Hero Image Container -->
+        <div class="absolute top-0 right-0 w-1/2 h-full hidden lg:block">
+            <div class="absolute inset-0 bg-gradient-to-l from-transparent to-warm-neutral z-10"></div>
+            <img src="/landing_hero.png" class="w-full h-full object-cover object-left scale-110" alt="Hero Background" />
+        </div>
+    </section>
+
+    <!-- Features Grid -->
+    <section class="py-32 px-12 bg-white relative">
+        <div class="text-center mb-20">
+            <h2 class="text-5xl font-black text-house-green mb-4">Every detail, perfectly extracted.</h2>
+            <p class="text-lg text-text-black-soft">Tools designed for modern teams who appreciate the finer things.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="space-y-6 p-8 rounded-[32px] bg-ceramic/30 border border-black/[0.03] hover:shadow-xl transition-all">
+                <div class="w-16 h-16 bg-starbucks-green rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <h3 class="text-2xl font-extrabold text-house-green">Espresso Speed</h3>
+                <p class="text-text-black-soft font-medium leading-relaxed">Update statuses, assign partners, and track progress with lightning-fast interactions.</p>
+            </div>
+            
+            <div class="space-y-6 p-8 rounded-[32px] bg-ceramic/30 border border-black/[0.03] hover:shadow-xl transition-all">
+                <div class="w-16 h-16 bg-gold rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <h3 class="text-2xl font-extrabold text-house-green">Partner Harmony</h3>
+                <p class="text-text-black-soft font-medium leading-relaxed">Seamless collaboration between admins, managers, and employees in a unified environment.</p>
+            </div>
+            
+            <div class="space-y-6 p-8 rounded-[32px] bg-ceramic/30 border border-black/[0.03] hover:shadow-xl transition-all">
+                <div class="w-16 h-16 bg-house-green rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3 class="text-2xl font-extrabold text-house-green">Rich Insights</h3>
+                <p class="text-text-black-soft font-medium leading-relaxed">Visual reports that show the depth of your productivity roast and team output.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-house-green py-20 px-12 text-white">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-12 border-b border-white/10 pb-12 mb-12">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-starbucks-green text-xl font-bold">
+                    <i class="fa-solid fa-mug-hot"></i>
+                </div>
+                <span class="text-3xl font-black tracking-tighter">TaskBrew</span>
+            </div>
+            <div class="flex gap-10">
+                <a href="#" class="text-sm font-bold hover:text-gold transition-colors">Privacy</a>
+                <a href="#" class="text-sm font-bold hover:text-gold transition-colors">Terms</a>
+                <a href="#" class="text-sm font-bold hover:text-gold transition-colors">Contact</a>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-white/40 text-sm">
+            <p>&copy; 2026 TaskBrew Inc. All rights reserved. Part of the Starbucks Digital Network.</p>
+            <div class="flex gap-6 text-xl">
+                <i class="fa-brands fa-instagram"></i>
+                <i class="fa-brands fa-twitter"></i>
+                <i class="fa-brands fa-linkedin"></i>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

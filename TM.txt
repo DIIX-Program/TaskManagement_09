@@ -1,0 +1,44 @@
+Manager : Được xem tất cả dự án > Không thể sửa dự án không tham gia cũng không được thêm cộng sự với dự án không tham gia 
+- Không được thêm task cho dự án không tham gia 
+
+
+Admin sẽ cấp quyền cho ai làm Manager và ai là Employee 
+Quản lý của Admin phần Dự án : Phần tìm kiếm , bộ lọc trạng thái dự án 
+Phần Dự án/Chi tiết Admin có quyền chỉnh sửa , Manager có quyền chỉnh sửa dự án đang đang tham gia 
+Phần Chỉ số sức khỏe thay thành tiến độ dự án : tính bằng : vd 20 nhiệm vụ giao vậy công thức ( Tổng số nhiệm vụ hoàn thành nhân 100 và  chia cho tổng nhiệm vụ ) ra % hoàn thành
+Phần Dự án/Chi tiết Admin  > Danh sách công việc vẫn chưa tạo được nhiệm vụ (ấn vào Tạo công việc đầu tiên ) sẽ hiện trang công việc để thêm công việc 
+Quản lý của Admin trong đội ngũ (Our Partners) thêm nhân viên qua email 
+Quản lý của Admin trong đội ngũ (Our Partners) phần bộ lọc chưa hoạt động 
+Quản lý của Admin trong đội ngũ (Our Partners) Admin và Manager có quyền gửi thông báo đến nhân viên
+Quản lý của Admin trong Công việc bộ lọc chưa hoạt động và tính năng tìm kiếm  
+
+Quản lý của Admin trong Báo Cáo : Cho Xuất báo cáo dựa trên Dự án , Chọn Dự án > Xuất Báo Cáo 
+Quản lý của Admin trong Báo Cáo : Thêm một thanh tìm kiếm nhân sự và có thêm bảng nhân viên đóng góp nhiều , hoàn thành nhiều task trong Dự án được lọc 
+Thông báo của ai người đó thấy , Admin gửi cho ai cũng được , Manager gửi người trong dự án , thêm phần gửi và chọn những người nhận nhé 
+Đọc thông báo xong thì đánh dấu là đã đọc 
+
+
+
+Quản lý : Tạo công việc cho dự án mình tham gia , giao việc , xem tiến độ dự án , ai trong dự án làm gì , chỉ xem dự án nào mình tham gia 
+
+Phần cài đặt > Cấu Hình thông báo , hãy hiện như này Giao việc mới, Thay đổi trạng thái ,Dự án mới ,Sắp đến hạn (chọn mức ưu tiên) 
+
+
+
+Employee : 
+Xem ai tham gia cùng dự án 
+Xem Nhiệm Vụ mình được giao và các người tham gia cùng dự án được giao nhiệm vụ gì 
+Đọc thông báo và gửi báo cáo đến Manager trong dự án (báo cáo cũng là kiểu thư gửi nhé , Người gửi và người nhận được đọc )
+
+
+
+langdingpage làm hiện tại chưa tốt :
+Các Trang Privacy,Terms,Contact , Our Blend,Partner Perks hãy làm trang kiểu giới thiệu nhé cơ bản 
+
+Phần tạo tài khoản :
+Khi tạo tài thì sẽ báo tạo thành công , và đợi admin thêm vào và phân quyền 
+
+
+
+Lỗi :
+An error occurred while saving the entity changes. See the inner exception for details.

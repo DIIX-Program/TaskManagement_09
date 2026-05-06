@@ -1,0 +1,46 @@
+@model TaskManagement.Web.Services.ProjectViewModel
+
+<div class="max-w-3xl mx-auto space-y-8">
+    <div class="bg-white p-8 rounded-[24px] shadow-soft border border-black/[0.03]">
+        <nav class="flex text-xs font-bold uppercase tracking-widest text-text-black-soft gap-2 mb-4">
+            <a asp-action="Index" class="hover:text-starbucks-green transition-colors">Projects</a>
+            <span>/</span>
+            <span class="text-starbucks-green">Edit</span>
+        </nav>
+        <h1 class="text-3xl font-extrabold text-house-green">Refine the Roast</h1>
+        <p class="text-text-black-soft font-medium">Update the project details to keep your team aligned.</p>
+    </div>
+
+    <form asp-action="Edit" method="post" class="card space-y-8">
+        <input type="hidden" asp-for="ProjectId" />
+        <div asp-validation-summary="ModelOnly" class="text-red-500 text-sm"></div>
+
+        <div class="space-y-2">
+            <label asp-for="Name" class="text-xs font-black uppercase tracking-widest text-house-green">Project Name</label>
+            <input asp-for="Name" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-semibold" />
+            <span asp-validation-for="Name" class="text-red-500 text-xs"></span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-2">
+                <label asp-for="StartDate" class="text-xs font-black uppercase tracking-widest text-house-green">Start Date</label>
+                <input asp-for="StartDate" type="date" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-semibold" />
+            </div>
+
+            <div class="space-y-2">
+                <label asp-for="EndDate" class="text-xs font-black uppercase tracking-widest text-house-green">End Date</label>
+                <input asp-for="EndDate" type="date" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-semibold" />
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <label asp-for="Description" class="text-xs font-black uppercase tracking-widest text-house-green">Description</label>
+            <textarea asp-for="Description" rows="4" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-medium"></textarea>
+        </div>
+
+        <div class="flex gap-4 pt-6">
+            <button type="submit" class="btn-primary flex-1 py-4 text-lg">Save Changes</button>
+            <a asp-action="Details" asp-route-id="@Model.ProjectId" class="btn-outline flex-1 py-4 text-lg text-center">Cancel</a>
+        </div>
+    </form>
+</div>

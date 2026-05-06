@@ -1,0 +1,11 @@
+@model dynamic
+
+<div class="card flex items-center justify-between">
+    <div>
+        <p class="text-xs font-semibold text-text-black-soft uppercase tracking-wider mb-1">@Model.Title</p>
+        <h4 class="text-3xl font-bold text-text-black">@Model.Value</h4>
+    </div>
+    <div class="w-12 h-12 rounded-full bg-ceramic flex items-center justify-center @Model.Color">
+        <i class="fa-solid @Model.Icon text-xl"></i>
+    </div>
+</div>

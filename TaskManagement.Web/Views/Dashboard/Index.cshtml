@@ -1,0 +1,155 @@
+@{
+    var role = Context.Session.GetString("Role");
+}
+
+<div class="space-y-10">
+    <!-- Welcome Header -->
+    <div class="bg-house-green p-10 rounded-[40px] text-white relative overflow-hidden shadow-2xl">
+        <div class="relative z-10">
+            <h1 class="text-5xl font-black mb-4">Chào mừng trở lại, <span class="text-gold">@Context.Session.GetString("FullName")</span>!</h1>
+            <p class="text-white/70 text-lg font-medium max-w-xl">Bạn có <span class="text-white font-bold">@ViewBag.TaskCount</span> công việc đang chờ xử lý. Hãy làm việc hiệu quả hôm nay.</p>
+            
+            <div class="flex gap-4 mt-8">
+                @if (role == "Admin" || role == "Manager")
+                {
+                    <a asp-controller="Projects" asp-action="Create" class="btn-gold py-3 px-8 shadow-xl">Tạo dự án mới</a>
+                }
+                <a asp-controller="Tasks" asp-action="Index" class="bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold py-3 px-8 rounded-pill hover:bg-white/20 transition-all">Xem tất cả công việc</a>
+            </div>
+        </div>
+        
+        <!-- Abstract Decorations -->
+        <div class="absolute -top-24 -right-24 w-80 h-80 bg-starbucks-green/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 -right-12 w-40 h-40 bg-gold/10 rounded-full blur-2xl"></div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="card group hover:border-starbucks-green transition-all">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-starbucks-green/10 rounded-2xl flex items-center justify-center text-starbucks-green text-3xl group-hover:bg-starbucks-green group-hover:text-white transition-all">
+                    <i class="fa-solid fa-folder"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest text-text-black-soft">Dự án đang chạy</p>
+                    <p class="text-3xl font-black text-house-green">@ViewBag.ProjectCount</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card group hover:border-gold transition-all">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-gold/10 rounded-2xl flex items-center justify-center text-gold text-3xl group-hover:bg-gold group-hover:text-white transition-all">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest text-text-black-soft">Tổng số công việc</p>
+                    <p class="text-3xl font-black text-house-green">@ViewBag.TaskCount</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card group hover:border-house-green transition-all">
+            <div class="flex items-center gap-6">
+                <div class="w-16 h-16 bg-ceramic/50 rounded-2xl flex items-center justify-center text-house-green text-3xl group-hover:bg-house-green group-hover:text-white transition-all">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-black uppercase tracking-widest text-text-black-soft">Đồng nghiệp</p>
+                    <p class="text-3xl font-black text-house-green">@ViewBag.TeamCount</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Recent Tasks (Action oriented) -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="flex justify-between items-center px-4">
+                <h3 class="text-2xl font-black text-house-green">Công việc tiếp theo?</h3>
+                <a asp-controller="Tasks" asp-action="Index" class="text-sm font-bold text-starbucks-green hover:underline">Xem toàn bộ</a>
+            </div>
+            
+            <div class="space-y-4">
+                @foreach (var task in (IEnumerable<TaskManagement.Web.Services.TaskResponseViewModel>)ViewBag.RecentTasks)
+                {
+                    <div class="bg-white p-6 rounded-3xl border border-black/[0.03] shadow-sm hover:shadow-md transition-all flex items-center justify-between group">
+                        <div class="flex items-center gap-6">
+                            <div class="w-12 h-12 rounded-2xl bg-ceramic/30 flex items-center justify-center text-house-green font-bold">
+                                <i class="fa-solid fa-mug-hot"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-house-green">@task.Title</h4>
+                                <p class="text-xs text-text-black-soft font-medium">Dự án: <span class="text-gold">@task.ProjectName</span></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <div class="text-right hidden md:block">
+                                <p class="text-xs font-black uppercase tracking-widest text-text-black-soft mb-1">Hạn chót</p>
+                                <p class="text-sm font-bold text-house-green">@task.Deadline?.ToString("dd/MM")</p>
+                            </div>
+                            <span class="px-4 py-2 bg-starbucks-green/10 text-starbucks-green rounded-pill text-xs font-black uppercase tracking-widest">@task.StatusName</span>
+                            <a asp-controller="Tasks" asp-action="Edit" asp-route-id="@task.TaskId" class="w-10 h-10 rounded-full bg-ceramic/20 flex items-center justify-center text-house-green opacity-0 group-hover:opacity-100 transition-all">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Role Specific Quick Actions -->
+        <div class="space-y-6">
+            <h3 class="text-2xl font-black text-house-green px-4">Thao tác nhanh</h3>
+            
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="mx-4 p-4 bg-starbucks-green/10 border border-starbucks-green/20 text-starbucks-green rounded-2xl text-sm font-bold animate-bounce">
+                    <i class="fa-solid fa-circle-check mr-2"></i> @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <div class="card space-y-4">
+                @if (role == "Admin")
+                {
+                    <a asp-controller="Projects" asp-action="Index" class="block w-full p-4 rounded-2xl bg-ceramic/20 text-left hover:bg-starbucks-green hover:text-white transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i class="fa-solid fa-user-plus text-starbucks-green group-hover:text-white"></i>
+                            <span class="font-bold">Quản lý & Thêm thành viên</span>
+                        </div>
+                    </a>
+                    <a asp-controller="Reports" asp-action="Index" class="block w-full p-4 rounded-2xl bg-ceramic/20 text-left hover:bg-gold hover:text-white transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i class="fa-solid fa-chart-pie text-gold group-hover:text-white"></i>
+                            <span class="font-bold">Báo cáo nhân sự</span>
+                        </div>
+                    </a>
+                }
+                
+                <form asp-action="CheckIn" method="post">
+                    <button type="submit" class="w-full p-4 rounded-2xl bg-ceramic/20 text-left hover:bg-house-green hover:text-white transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i class="fa-solid fa-circle-check text-house-green group-hover:text-white"></i>
+                            <span class="font-bold">Điểm danh hôm nay</span>
+                        </div>
+                    </button>
+                </form>
+
+                <a asp-controller="Settings" asp-action="Index" class="block w-full p-4 rounded-2xl bg-ceramic/20 text-left hover:bg-starbucks-green hover:text-white transition-all group">
+                    <div class="flex items-center gap-4">
+                        <i class="fa-solid fa-user-gear text-starbucks-green group-hover:text-white"></i>
+                        <span class="font-bold">Cài đặt tài khoản</span>
+                    </div>
+                </a>
+                
+                <div class="pt-6 border-t border-black/[0.06] mt-6">
+                    <div class="bg-gold/10 p-6 rounded-3xl border border-gold/20">
+                        <h5 class="text-gold font-black uppercase tracking-widest text-[10px] mb-2">Quyền lợi thành viên</h5>
+                        <p class="text-house-green font-bold text-sm leading-relaxed italic">"Cà phê sáng hôm nay là miễn phí! Kiểm tra ứng dụng thành viên để lấy mã."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

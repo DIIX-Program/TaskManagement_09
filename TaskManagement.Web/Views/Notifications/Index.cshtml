@@ -1,0 +1,42 @@
+@model IEnumerable<TaskManagement.Web.Services.NotificationViewModel>
+
+<div class="max-w-4xl mx-auto space-y-8">
+    <div class="flex justify-between items-center bg-white p-8 rounded-[24px] shadow-soft border border-black/[0.03]">
+        <div>
+            <h1 class="text-4xl font-extrabold text-house-green">Notifications</h1>
+            <p class="text-text-black-soft font-medium">Stay updated with your latest team activities.</p>
+        </div>
+        <button class="px-6 py-3 bg-ceramic text-house-green rounded-pill font-bold hover:bg-starbucks-green hover:text-white transition-all">Mark all as read</button>
+    </div>
+
+    <div class="space-y-4">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var note in Model)
+            {
+                <div class="bg-white p-6 rounded-2xl border @(note.IsRead ? "border-black/[0.03]" : "border-starbucks-green/30 bg-starbucks-green/5") shadow-sm flex gap-6 items-start hover:shadow-md transition-all">
+                    <div class="w-12 h-12 rounded-full @(note.IsRead ? "bg-ceramic/50 text-text-black-soft" : "bg-starbucks-green text-white") flex items-center justify-center text-lg flex-shrink-0">
+                        <i class="fa-solid @(note.IsRead ? "fa-envelope-open" : "fa-envelope")"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-1">
+                            <h3 class="font-bold text-house-green">System Notification</h3>
+                            <span class="text-xs font-semibold text-text-black-soft">@note.CreatedAt.ToString("MMM dd, hh:mm tt")</span>
+                        </div>
+                        <p class="text-text-black-soft font-medium leading-relaxed">@note.Message</p>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-20 bg-white rounded-[32px] border border-dashed border-black/10">
+                <div class="w-20 h-20 bg-ceramic/30 rounded-full flex items-center justify-center text-3xl text-ceramic mx-auto mb-6">
+                    <i class="fa-solid fa-bell-slash"></i>
+                </div>
+                <h3 class="text-xl font-bold text-house-green mb-2">No notifications yet</h3>
+                <p class="text-text-black-soft">We'll notify you when something important happens.</p>
+            </div>
+        }
+    </div>
+</div>

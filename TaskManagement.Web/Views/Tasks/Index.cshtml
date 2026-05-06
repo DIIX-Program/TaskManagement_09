@@ -1,0 +1,152 @@
+@model IEnumerable<TaskManagement.Web.Services.TaskResponseViewModel>
+
+<div class="flex flex-col gap-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-starbucks-green">Công việc</h1>
+            <p class="text-text-black-soft">Theo dõi các thành tựu cá nhân của bạn.</p>
+        </div>
+        <a asp-action="Create" class="btn-primary flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i>
+            <span>Công việc mới</span>
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-4 rounded-xl border border-black/[0.06] shadow-sm">
+        <div class="md:col-span-2 relative">
+            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-text-black-soft"></i>
+            <input type="text" placeholder="Lọc công việc theo tên hoặc dự án..." class="w-full pl-12 pr-4 py-2 bg-ceramic/50 rounded-lg outline-none focus:ring-2 focus:ring-starbucks-green/20 text-sm" />
+        </div>
+        <select class="bg-ceramic/50 px-4 py-2 rounded-lg outline-none border-none text-sm font-semibold">
+            <option>Tất cả độ ưu tiên</option>
+            <option>Cao</option>
+            <option>Trung bình</option>
+            <option>Thấp</option>
+        </select>
+        <select class="bg-ceramic/50 px-4 py-2 rounded-lg outline-none border-none text-sm font-semibold">
+            <option>Tất cả trạng thái</option>
+            <option value="To Do">Cần làm</option>
+            <option value="In Progress">Đang thực hiện</option>
+            <option value="Completed">Đã hoàn thành</option>
+            <option value="Overdue">Quá hạn</option>
+        </select>
+    </div>
+
+    <!-- Task Table -->
+    <div class="bg-white rounded-xl border border-black/[0.06] shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-ceramic/30 border-b border-black/[0.06]">
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-text-black-soft">Tiêu đề công việc</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-text-black-soft">Dự án</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-text-black-soft">Người thực hiện</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-text-black-soft">Hạn chót</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-text-black-soft">Ưu tiên</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-text-black-soft">Trạng thái</th>
+                    <th class="px-6 py-4 text-xs font-bold uppercase tracking-widest text-text-black-soft"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-black/[0.06]">
+                @foreach (var task in Model)
+                {
+                    <tr class="hover:bg-ceramic/20 transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full @(task.Priority == 3 ? "bg-red-500" : task.Priority == 2 ? "bg-gold" : "bg-starbucks-green")"></div>
+                                <span class="font-semibold text-text-black group-hover:text-starbucks-green transition-colors">@task.Title</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm text-text-black-soft font-medium">@task.ProjectName</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-starbucks-green/10 flex items-center justify-center text-[10px] font-bold text-starbucks-green border border-starbucks-green/20">
+                                    @(task.AssigneeName?.Substring(0, 1) ?? "?")
+                                </div>
+                                <span class="text-sm text-text-black-soft">@task.AssigneeName</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm @(task.Deadline < DateTime.Now ? "text-red-600 font-bold" : "text-text-black-soft")">
+                                @(task.Deadline?.ToString("dd/MM/yyyy") ?? "Không có hạn")
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase @(task.Priority == 3 ? "bg-red-50 text-red-600" : task.Priority == 2 ? "bg-gold/10 text-gold" : "bg-starbucks-green/10 text-starbucks-green")">
+                                @(task.Priority == 3 ? "Cao" : task.Priority == 2 ? "Trung bình" : "Thấp")
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @{
+                                var statuses = new[] { 
+                                    new { Key = "To Do", Value = "Cần làm" }, 
+                                    new { Key = "In Progress", Value = "Đang thực hiện" }, 
+                                    new { Key = "Completed", Value = "Đã hoàn thành" }, 
+                                    new { Key = "Overdue", Value = "Quá hạn" } 
+                                };
+                            }
+                            <select onchange="updateTaskStatus(@task.TaskId, this.value)" class="bg-transparent border-none text-xs font-bold uppercase tracking-wider focus:ring-0 cursor-pointer @(task.StatusName == "Completed" ? "text-uplift-green" : task.StatusName == "In Progress" ? "text-accent-green" : "text-text-black-soft")">
+                                @foreach (var status in statuses)
+                                {
+                                    <option value="@status.Key" selected="@(task.StatusName == status.Key)">@status.Value</option>
+                                }
+                            </select>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex gap-2 justify-end">
+                                <button class="text-text-black-soft hover:text-starbucks-green transition-colors">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <button onclick="deleteTask(@task.TaskId)" class="text-text-black-soft hover:text-red-500 transition-colors">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="px-6 py-20 text-center">
+                            <p class="text-text-black-soft italic">Không tìm thấy công việc nào. Đã đến lúc pha chế năng suất!</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateTaskStatus(taskId, statusName) {
+            const statusMap = { "To Do": 1, "In Progress": 2, "Completed": 3, "Overdue": 4 };
+            const statusId = statusMap[statusName];
+
+            fetch(`/Tasks/UpdateStatus/${taskId}?statusId=${statusId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(res => {
+                if(res.ok) {
+                    window.location.reload();
+                }
+            });
+        }
+        async function deleteTask(taskId) {
+            if(!confirm('Bạn có chắc chắn muốn xóa công việc này?')) return;
+
+            const response = await fetch(`/Tasks/Delete/${taskId}`, {
+                method: 'POST'
+            });
+
+            if(response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi xóa công việc');
+            }
+        }
+    </script>
+}

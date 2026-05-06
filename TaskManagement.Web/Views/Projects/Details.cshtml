@@ -1,0 +1,282 @@
+@model TaskManagement.Web.Services.ProjectViewModel
+
+<div class="space-y-8">
+    <!-- Project Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white p-8 rounded-[24px] shadow-soft border border-black/[0.03]">
+        <div class="space-y-4">
+            <nav class="flex text-xs font-bold uppercase tracking-widest text-text-black-soft gap-2">
+                <a asp-action="Index" class="hover:text-starbucks-green transition-colors">Dự án</a>
+                <span>/</span>
+                <span class="text-starbucks-green">Chi tiết</span>
+            </nav>
+            <h1 class="text-4xl font-extrabold text-house-green">@Model.Name</h1>
+            <p class="text-text-black-soft text-lg max-w-2xl font-medium">@Model.Description</p>
+            <div class="flex gap-6 pt-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-day text-gold"></i>
+                    <span class="text-sm font-semibold text-text-black">Bắt đầu: @Model.StartDate?.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-user-tie text-accent-green"></i>
+                    <span class="text-sm font-semibold text-text-black">Chủ dự án: @Model.CreatorName</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            @{
+                var currentUserId = int.Parse(Context.Session.GetString("UserId") ?? "0");
+                var currentUserRole = Context.Session.GetString("Role");
+                var isMember = Model.Members?.Any(m => m.UserId == currentUserId) ?? false;
+                var canEdit = currentUserRole == "Admin" || (currentUserRole == "Manager" && isMember);
+            }
+
+            @if (canEdit)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.ProjectId" class="btn-outline">Chỉnh sửa</a>
+                <button class="btn-outline border-red-500 text-red-500 hover:bg-red-500 hover:text-white" onclick="deleteProject()">Xóa dự án</button>
+                <button class="btn-gold" onclick="openAddMemberModal()">Thêm cộng sự</button>
+            }
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Column: Tasks -->
+        <div class="lg:col-span-2 space-y-8">
+            <div class="card">
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-2xl font-bold">Danh sách công việc</h3>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 bg-ceramic rounded-full text-xs font-bold">@Model.Tasks?.Count() công việc</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    @if (Model.Tasks != null && Model.Tasks.Any())
+                    {
+                        @foreach (var task in Model.Tasks)
+                        {
+                            <div class="group flex items-center justify-between p-5 rounded-2xl border border-black/[0.06] hover:border-starbucks-green hover:bg-starbucks-green/[0.02] transition-all">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-full @(task.Priority == 3 ? "bg-red-50 text-red-600" : "bg-starbucks-green/10 text-starbucks-green") flex items-center justify-center">
+                                        <i class="fa-solid fa-check-double text-lg"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-house-green group-hover:text-starbucks-green transition-colors">@task.Title</h4>
+                                        <p class="text-xs text-text-black-soft font-medium">Người thực hiện: @task.AssigneeName</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-6">
+                                    <span class="status-badge @(task.StatusName == "Completed" ? "bg-uplift-green/10 text-uplift-green border-uplift-green/20" : "bg-gold/10 text-gold border-gold/20")">@task.StatusName</span>
+                                    <div class="text-right">
+                                        <p class="text-xs font-bold text-house-green">@task.Deadline?.ToString("dd/MM")</p>
+                                        <p class="text-[10px] text-text-black-soft uppercase font-black">Hạn chót</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="py-12 text-center">
+                            <div class="w-16 h-16 bg-ceramic rounded-full flex items-center justify-center mx-auto mb-4 text-text-black-soft">
+                                <i class="fa-solid fa-list-check text-2xl"></i>
+                            </div>
+                            <p class="text-text-black-soft italic font-medium">Chưa có công việc nào cho dự án này.</p>
+                            @if (canEdit)
+                            {
+                                <a asp-controller="Tasks" asp-action="Create" asp-route-projectId="@Model.ProjectId" class="text-accent-green font-bold hover:underline mt-2 inline-block">Tạo công việc đầu tiên</a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Column: Members & Stats -->
+        <div class="space-y-8">
+            <!-- Members Card -->
+            <div class="card">
+                <h3 class="text-xl font-bold mb-6">Cộng sự</h3>
+                <div class="space-y-5">
+                    @if (Model.Members != null)
+                    {
+                        @foreach (var member in Model.Members)
+                        {
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-ceramic border-2 border-white shadow-sm flex items-center justify-center font-bold text-starbucks-green">
+                                        @member.FullName.Substring(0, 1)
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-bold text-house-green leading-tight">@member.FullName</p>
+                                        <p class="text-[10px] text-text-black-soft uppercase font-black">@member.JoinedAt.ToString("MM/yyyy")</p>
+                                    </div>
+                                </div>
+                                <button onclick="removeMember(@member.UserId)" class="text-text-black-soft hover:text-red-500 transition-colors">
+                                    <i class="fa-solid fa-circle-minus"></i>
+                                </button>
+                            </div>
+                        }
+                    }
+                </div>
+                @if (Context.Session.GetString("Role") != "Employee")
+                {
+                    <button onclick="openAddMemberModal()" class="w-full mt-8 py-3 rounded-pill bg-ceramic text-house-green font-bold text-sm hover:bg-black/5 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>Quản lý nhóm</span>
+                    </button>
+                }
+            </div>
+
+            <!-- Stats Card -->
+            <div class="card bg-starbucks-mesh text-white">
+                <h3 class="text-xl font-bold mb-6 text-white">Tiến độ dự án</h3>
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="text-5xl font-black text-gold">@Model.Progress%</span>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-white/60">Trạng thái</p>
+                        <p class="text-sm font-semibold text-gold">
+                            @(Model.Progress == 100 ? "Hoàn thành" : Model.Progress > 50 ? "Đang tiến triển tốt" : "Đang thực hiện")
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-xs font-bold text-white/80">
+                        @{
+                            var completedTasks = Model.Tasks?.Count(t => t.StatusName == "Completed") ?? 0;
+                            var totalTasks = Model.Tasks?.Count() ?? 0;
+                        }
+                        <span>Hoàn thành</span>
+                        <span>@completedTasks/@totalTasks</span>
+                    </div>
+                    <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                        <div class="bg-gold h-full rounded-full" style="width: @Model.Progress%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal Placeholder -->
+<div id="addMemberModal" class="fixed inset-0 bg-house-green/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-6">
+    <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-md p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-bold text-house-green">Thêm cộng sự mới</h3>
+            <button onclick="closeAddMemberModal()" class="text-text-black-soft hover:text-house-green text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="space-y-6">
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Cách 1: Chọn từ danh sách</label>
+                <select id="partnerSelect" class="w-full p-4 bg-ceramic/50 rounded-xl border-none outline-none focus:ring-4 focus:ring-starbucks-green/10 font-medium">
+                    <option disabled selected value="">Chọn thành viên đội ngũ...</option>
+                    @foreach (var user in (IEnumerable<TaskManagement.Web.Services.UserViewModel>)ViewBag.AllUsers)
+                    {
+                        if (Model.Members == null || !Model.Members.Any(m => m.UserId == user.UserId))
+                        {
+                            <option value="@user.UserId">@user.FullName (@user.RoleName)</option>
+                        }
+                    }
+                </select>
+            </div>
+            
+            <div class="relative py-2">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-black/[0.06]"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-text-black-soft font-bold">Hoặc</span></div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Cách 2: Thêm qua Email</label>
+                <input type="email" id="partnerEmail" placeholder="partner@starbucks.com" class="w-full p-4 bg-ceramic/50 rounded-xl border-none outline-none focus:ring-4 focus:ring-starbucks-green/10 font-medium" />
+            </div>
+
+            <button onclick="handleAddMember()" class="btn-gold w-full py-4 text-lg">Gửi lời mời</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openAddMemberModal() {
+            document.getElementById('addMemberModal').classList.remove('hidden');
+            document.getElementById('addMemberModal').classList.add('flex');
+        }
+        function closeAddMemberModal() {
+            document.getElementById('addMemberModal').classList.add('hidden');
+            document.getElementById('addMemberModal').classList.remove('flex');
+        }
+
+        async function handleAddMember() {
+            const userId = document.getElementById('partnerSelect').value;
+            const email = document.getElementById('partnerEmail').value;
+
+            if (userId) {
+                await addMemberById(userId);
+            } else if (email) {
+                await addMemberByEmail(email);
+            } else {
+                alert('Vui lòng chọn cộng sự hoặc nhập email.');
+            }
+        }
+
+        async function addMemberById(userId) {
+            const response = await fetch(`/Projects/AddMember?projectId=@Model.ProjectId&userId=${userId}`, {
+                method: 'POST'
+            });
+
+            if(response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi thêm thành viên');
+            }
+        }
+
+        async function addMemberByEmail(email) {
+            const formData = new FormData();
+            formData.append('projectId', '@Model.ProjectId');
+            formData.append('email', email);
+
+            const response = await fetch(`/Projects/AddMemberByEmail`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if(response.ok) {
+                location.reload();
+            } else {
+                const text = await response.text();
+                alert('Thất bại: ' + text);
+            }
+        }
+
+        async function removeMember(userId) {
+            if(!confirm('Bạn có chắc chắn muốn xóa cộng sự này khỏi dự án?')) return;
+
+            const response = await fetch(`/Projects/RemoveMember?projectId=@Model.ProjectId&userId=${userId}`, {
+                method: 'POST'
+            });
+
+            if(response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi xóa thành viên');
+            }
+        }
+
+        async function deleteProject() {
+            if(!confirm('Bạn có chắc chắn muốn xóa dự án này và toàn bộ công việc liên quan? Hành động này không thể hoàn tác.')) return;
+
+            const response = await fetch(`/Projects/Delete?id=@Model.ProjectId`, {
+                method: 'POST'
+            });
+
+            if(response.ok) {
+                window.location.href = '/Projects';
+            } else {
+                alert('Lỗi khi xóa dự án');
+            }
+        }
+    </script>
+}

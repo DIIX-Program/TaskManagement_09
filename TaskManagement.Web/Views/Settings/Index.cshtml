@@ -1,0 +1,128 @@
+@model TaskManagement.Web.Services.UserViewModel
+
+<div class="max-w-4xl mx-auto space-y-8">
+    <div class="bg-white p-8 rounded-[24px] shadow-soft border border-black/[0.03]">
+        <h1 class="text-3xl font-extrabold text-house-green">Cài đặt tài khoản</h1>
+        <p class="text-text-black-soft font-medium">Quản lý hồ sơ cá nhân và bảo mật của bạn.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Sidebar Navigation -->
+        <div class="space-y-2 sticky top-8">
+            <button onclick="document.getElementById('profile-section').scrollIntoView({behavior:'smooth'})" class="w-full text-left px-6 py-3 rounded-xl bg-starbucks-green text-white font-bold shadow-lg shadow-starbucks-green/20">Thông tin cá nhân</button>
+            <button onclick="document.getElementById('security-section').scrollIntoView({behavior:'smooth'})" class="w-full text-left px-6 py-3 rounded-xl text-text-black-soft hover:bg-ceramic transition-all font-semibold">Bảo mật & Mật khẩu</button>
+            <button onclick="document.getElementById('notifications-section').scrollIntoView({behavior:'smooth'})" class="w-full text-left px-6 py-3 rounded-xl text-text-black-soft hover:bg-ceramic transition-all font-semibold">Cấu hình thông báo</button>
+        </div>
+
+        <!-- Main Settings Form -->
+        <div class="lg:col-span-2 space-y-8">
+            <div class="card" id="profile-section">
+                <h3 class="text-xl font-bold mb-8">Chi tiết cá nhân</h3>
+                
+                <div class="flex items-center gap-8 mb-10 pb-8 border-b border-black/[0.03]">
+                    <div class="w-24 h-24 rounded-full bg-ceramic flex items-center justify-center text-4xl text-starbucks-green font-black shadow-inner border-4 border-white overflow-hidden relative group">
+                        @if (string.IsNullOrEmpty(Model?.AvatarUrl))
+                        {
+                            <span>@Context.Session.GetString("FullName")?[0]</span>
+                        }
+                        else
+                        {
+                            <img src="http://127.0.0.1:5129@(Model.AvatarUrl)" class="w-full h-full object-cover" />
+                        }
+                    </div>
+                    <div>
+                        <form asp-action="UploadAvatar" method="post" enctype="multipart/form-data" id="avatarForm">
+                            <input type="file" name="file" id="avatarInput" class="hidden" onchange="document.getElementById('avatarForm').submit()" />
+                            <button type="button" onclick="document.getElementById('avatarInput').click()" class="btn-primary py-2 px-6 text-sm mb-2">Đổi ảnh đại diện</button>
+                        </form>
+                        <p class="text-xs text-text-black-soft">JPG, GIF hoặc PNG. Tối đa 2MB.</p>
+                    </div>
+                </div>
+
+                <form asp-action="UpdateProfile" method="post" class="space-y-6">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="flex-1 space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Họ và tên</label>
+                            <input name="fullName" type="text" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-semibold" value="@(Model?.FullName ?? Context.Session.GetString("FullName"))" />
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Địa chỉ Email</label>
+                        <input type="email" class="w-full p-4 bg-ceramic/10 rounded-xl border border-black/[0.06] outline-none font-semibold text-gray-500 cursor-not-allowed" value="@(Model?.Email ?? "partner@starbucks.com")" readonly />
+                    </div>
+                    <div class="pt-6">
+                        <button type="submit" class="btn-primary px-10">Cập nhật hồ sơ</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" id="notifications-section">
+                <h3 class="text-xl font-bold mb-8">Cấu hình thông báo</h3>
+                <p class="text-sm text-text-black-soft mb-6">Chọn loại thông báo bạn muốn ưu tiên hàng đầu.</p>
+                <form asp-action="UpdatePreferences" method="post" class="space-y-4">
+                    @{
+                        var types = new[] { 
+                            new { Id = 1, Name = "Giao việc mới" }, 
+                            new { Id = 2, Name = "Thay đổi trạng thái" }, 
+                            new { Id = 3, Name = "Dự án mới" },
+                            new { Id = 4, Name = "Sắp đến hạn" }
+                        };
+                    }
+                    @for (int i = 0; i < types.Length; i++)
+                    {
+                        <div class="flex items-center justify-between p-4 bg-ceramic/20 rounded-xl">
+                            <span class="font-semibold text-house-green">@types[i].Name</span>
+                            <div class="flex items-center gap-2">
+                                <input type="hidden" name="preferences[@i].Type" value="@types[i].Id" />
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="preferences[@i].IsPriority" value="true" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-starbucks-green"></div>
+                                    <span class="ml-3 text-sm font-bold text-text-black-soft uppercase tracking-widest">Ưu tiên</span>
+                                </label>
+                            </div>
+                        </div>
+                    }
+                    <div class="pt-6">
+                        <button type="submit" class="btn-gold px-10">Lưu cấu hình</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" id="security-section">
+                <h3 class="text-xl font-bold mb-8">Bảo mật & Mật khẩu</h3>
+                <form asp-action="ChangePassword" method="post" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Mật khẩu hiện tại</label>
+                        <input name="currentPassword" type="password" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-semibold" />
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Mật khẩu mới</label>
+                            <input name="newPassword" type="password" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-semibold" />
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Xác nhận mật khẩu</label>
+                            <input type="password" class="w-full p-4 bg-ceramic/30 rounded-xl border border-black/[0.06] outline-none focus:ring-4 focus:ring-starbucks-green/10 font-semibold" />
+                        </div>
+                    </div>
+                    <div class="pt-6">
+                        <button type="submit" class="px-8 py-3 bg-house-green text-white rounded-pill font-bold hover:shadow-lg transition-all">Đổi mật khẩu</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3 class="text-xl font-bold mb-8 text-red-600">Khu vực nguy hiểm</h3>
+                <div class="p-4 bg-red-50 rounded-xl border border-red-100 mb-6">
+                    <p class="text-sm text-red-800 font-medium">
+                        <i class="fa-solid fa-triangle-exclamation mr-2"></i>
+                        Một khi bạn vô hiệu hóa tài khoản, bạn sẽ mất quyền truy cập vào tất cả dữ liệu dự án. Hành động này không thể hoàn tác.
+                    </p>
+                </div>
+                <form asp-action="DeactivateAccount" method="post">
+                    <button type="submit" onclick="return confirm('Bạn có chắc chắn? Hành động này không thể hoàn tác.')" class="px-6 py-3 rounded-pill border-2 border-red-500 text-red-500 font-bold hover:bg-red-500 hover:text-white transition-all">Vô hiệu hóa tài khoản</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

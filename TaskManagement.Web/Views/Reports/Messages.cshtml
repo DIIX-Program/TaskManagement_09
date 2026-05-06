@@ -1,0 +1,139 @@
+@model IEnumerable<TaskManagement.Web.Services.ReportMessageViewModel>
+
+<div class="space-y-8">
+    <div class="bg-white p-8 rounded-[32px] shadow-soft border border-black/[0.03] flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-extrabold text-house-green">Tin nhắn báo cáo</h1>
+            <p class="text-text-black-soft font-medium">Trao đổi và báo cáo tiến độ giữa Nhân viên và Quản lý.</p>
+        </div>
+        <button onclick="openSendReportModal()" class="btn-primary">
+            <i class="fa-solid fa-paper-plane mr-2"></i> Gửi báo cáo mới
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+        @foreach (var msg in Model)
+        {
+            <div class="card @(msg.IsRead ? "bg-white" : "bg-starbucks-green/5 border-starbucks-green") transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="px-2 py-0.5 bg-gold/10 text-gold text-[10px] font-black uppercase rounded">@msg.ProjectName</span>
+                            @if (!msg.IsRead)
+                            {
+                                <span class="w-2 h-2 bg-starbucks-green rounded-full"></span>
+                            }
+                        </div>
+                        <h3 class="text-xl font-bold text-house-green">@msg.Title</h3>
+                    </div>
+                    <span class="text-xs text-text-black-soft font-medium">@msg.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
+                
+                <p class="text-text-black-soft mb-6">@msg.Content</p>
+                
+                <div class="pt-4 border-t border-black/[0.03] flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-ceramic flex items-center justify-center text-xs font-bold">@msg.SenderName[0]</div>
+                        <span class="text-sm font-medium text-house-green">Từ: @msg.SenderName</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-text-black-soft">Đến: @msg.ReceiverName</span>
+                        <div class="w-8 h-8 rounded-full bg-ceramic flex items-center justify-center text-xs font-bold">@msg.ReceiverName[0]</div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="py-20 text-center bg-white rounded-2xl border-2 border-dashed border-black/[0.06]">
+                <i class="fa-solid fa-envelope-open text-4xl text-text-black-soft mb-4"></i>
+                <h3 class="text-xl font-bold text-text-black">Chưa có tin nhắn nào</h3>
+                <p class="text-text-black-soft mt-2">Các báo cáo và trao đổi sẽ xuất hiện tại đây.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Send Report Modal -->
+<div id="sendReportModal" class="fixed inset-0 bg-house-green/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-6">
+    <div class="bg-white rounded-[24px] shadow-2xl w-full max-w-lg p-8">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-2xl font-bold text-house-green">Gửi báo cáo / Tin nhắn</h3>
+            <button onclick="closeSendReportModal()" class="text-text-black-soft hover:text-house-green text-2xl"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <form id="reportForm" class="space-y-6">
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Dự án liên quan</label>
+                <select id="reportProjectId" class="w-full p-4 bg-ceramic/50 rounded-xl outline-none focus:ring-4 focus:ring-starbucks-green/10 font-medium">
+                    <!-- Loaded via JS -->
+                </select>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Người nhận</label>
+                <select id="reportReceiverId" class="w-full p-4 bg-ceramic/50 rounded-xl outline-none focus:ring-4 focus:ring-starbucks-green/10 font-medium">
+                    <!-- Loaded via JS -->
+                </select>
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Tiêu đề</label>
+                <input type="text" id="reportTitle" placeholder="VD: Báo cáo tiến độ tuần 1" class="w-full p-4 bg-ceramic/50 rounded-xl outline-none focus:ring-4 focus:ring-starbucks-green/10 font-medium" />
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-text-black-soft">Nội dung</label>
+                <textarea id="reportContent" rows="4" class="w-full p-4 bg-ceramic/50 rounded-xl outline-none focus:ring-4 focus:ring-starbucks-green/10 font-medium" placeholder="Mô tả chi tiết báo cáo của bạn..."></textarea>
+            </div>
+            <button type="button" onclick="handleSendReport()" class="btn-primary w-full py-4 text-lg">Gửi báo cáo</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openSendReportModal() {
+            // Load projects and users for selection
+            loadDataForReport();
+            document.getElementById('sendReportModal').classList.replace('hidden', 'flex');
+        }
+
+        function closeSendReportModal() {
+            document.getElementById('sendReportModal').classList.replace('flex', 'hidden');
+        }
+
+        async function loadDataForReport() {
+            const projectsRes = await fetch('/Projects/GetAllJson');
+            const projects = await projectsRes.json();
+            const projectSelect = document.getElementById('reportProjectId');
+            projectSelect.innerHTML = projects.map(p => `<option value="${p.projectId}">${p.name}</option>`).join('');
+
+            const usersRes = await fetch('/Team/GetAllJson');
+            const users = await usersRes.json();
+            const userSelect = document.getElementById('reportReceiverId');
+            userSelect.innerHTML = users.map(u => `<option value="${u.userId}">${u.fullName} (${u.roleName})</option>`).join('');
+        }
+
+        async function handleSendReport() {
+            const formData = {
+                projectId: document.getElementById('reportProjectId').value,
+                receiverId: document.getElementById('reportReceiverId').value,
+                title: document.getElementById('reportTitle').value,
+                content: document.getElementById('reportContent').value
+            };
+
+            if(!formData.title || !formData.content) return alert('Vui lòng điền đầy đủ thông tin');
+
+            const response = await fetch('/Reports/Send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData)
+            });
+
+            if(response.ok) {
+                alert('Gửi báo cáo thành công!');
+                location.reload();
+            } else {
+                alert('Lỗi khi gửi báo cáo');
+            }
+        }
+    </script>
+}
